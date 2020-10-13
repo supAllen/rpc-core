@@ -1,8 +1,10 @@
 com/netty/study/object/change/ObjectEchoClientHandler.class
 com/netty/study/object/change/ObjectEchoClient.class
+com/netty/study/object/change/ObjectEchoClient$4.class
 com/netty/study/Main.class
 com/netty/study/object/change/ObjectEchoServerHandler.class
 com/netty/study/object/change/ObjectEchoClient$2.class
 com/netty/study/object/change/ObjectEchoServer.class
+com/netty/study/object/change/ObjectEchoClient$3.class
 com/netty/study/object/change/ObjectEchoClient$1.class
 com/netty/study/object/change/ObjectEchoServer$1.class

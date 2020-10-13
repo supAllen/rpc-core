@@ -1,7 +1,7 @@
 package com.wjw.rpc.core.remote;
 
-import com.wjw.rpc.core.service.DefaultRpcContext;
-import com.wjw.rpc.core.service.RpcContext;
+import com.wjw.rpc.core.command.Response;
+import com.wjw.rpc.core.future.ResponseFuture;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 
@@ -11,17 +11,28 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
  * @create: 2020-09-30 17:23
  **/
 public class DefaultClientHandler extends ChannelInboundHandlerAdapter {
+
     @Override
-    public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-        System.out.println();
+    public void channelActive(ChannelHandlerContext ctx) {
+        System.out.println("建立连接成功...");
+        ctx.writeAndFlush("ping");
+        ctx.fireChannelActive();
+    }
+
+    @Override
+    public void channelRead(ChannelHandlerContext ctx, Object msg) {
         System.out.println(msg);
-        System.out.println(msg.getClass().getTypeName());
-//        RpcContext rpcContext = DefaultRpcContext.instance;
+        System.out.println(msg.getClass().getSimpleName());
+        if (msg instanceof Response) {
+            System.out.println("设置响应结果\t" + System.currentTimeMillis() + "\t" + msg + "\t" + ((Response) msg).getId());
+            ResponseFuture.responseReceived((Response) msg);
+        }
         ctx.fireChannelRead(msg);
     }
 
     @Override
-    public void channelActive(ChannelHandlerContext ctx) throws Exception {
-//        ctx.writeAndFlush("123");
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
+        cause.printStackTrace();
+        ctx.close();
     }
 }

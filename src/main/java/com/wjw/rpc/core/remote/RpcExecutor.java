@@ -16,7 +16,7 @@ public class RpcExecutor {
         this.rpcClient = new RpcClient();
     }
 
-    public Response exectue(Command command) {
+    public Object exectue(Command command) {
 //        String action = command.getAction();
         return rpcClient.send(command);
     }

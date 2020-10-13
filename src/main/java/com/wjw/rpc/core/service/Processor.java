@@ -3,6 +3,8 @@ package com.wjw.rpc.core.service;
 import com.wjw.rpc.core.command.RequestCommand;
 import com.wjw.rpc.core.command.Response;
 
+import java.lang.reflect.InvocationTargetException;
+
 /**
  * @description:
  * @author: wang.jianwen
@@ -11,9 +13,11 @@ import com.wjw.rpc.core.command.Response;
 public interface Processor {
 
     /**
-     *
+     * 方法执行
      * @param command
+     * @throws InvocationTargetException
+     * @throws IllegalAccessException
      * @return
      */
-    Response handler(RequestCommand command);
+    Response handler(RequestCommand command) throws InvocationTargetException, IllegalAccessException;
 }

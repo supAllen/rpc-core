@@ -25,7 +25,7 @@ public class RpcClientSimple {
         return new RpcClientSimple(serverUri);
     }
 
-    public Response exectue(Command command) {
+    public Object execute(Command command) {
         return rpcExecutor.exectue(command);
     }
 }

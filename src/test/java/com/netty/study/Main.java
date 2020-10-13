@@ -1,6 +1,8 @@
 package com.netty.study;
 
+import com.google.common.collect.ImmutableMap;
 import com.netty.study.object.change.ObjectEchoClient;
+import com.wjw.rpc.core.command.Command;
 
 /**
  * @description:
@@ -10,8 +12,12 @@ import com.netty.study.object.change.ObjectEchoClient;
 public class Main {
     public static void main(String[] args) {
         ObjectEchoClient client = new ObjectEchoClient();
+//        client.stop();
+//        client.send("123");
+        Command command = new Command("/service/rpc-demo", "hello", ImmutableMap.of("args", "hello"));
+        System.out.println("========================================");
         for (int i = 0; i < 5; i++) {
-            client.send("123");
+            client.send(command);
         }
     }
 }
