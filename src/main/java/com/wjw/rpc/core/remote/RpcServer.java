@@ -1,10 +1,8 @@
 package com.wjw.rpc.core.remote;
 
+import com.wjw.rpc.core.zk.ZKClient;
 import io.netty.bootstrap.ServerBootstrap;
-import io.netty.channel.ChannelInitializer;
-import io.netty.channel.ChannelOption;
-import io.netty.channel.ChannelPipeline;
-import io.netty.channel.EventLoopGroup;
+import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
@@ -21,16 +19,18 @@ import java.net.InetAddress;
  **/
 public class RpcServer implements IServer {
 
-    private Integer port;
+    private final Integer port;
+    private final String serviceUri;
     private EventLoopGroup bossGroup;
     private EventLoopGroup workerGroup;
 
-    public RpcServer(Integer port) {
+    public RpcServer(Integer port, String serviceUri) {
         this.port = port;
+        this.serviceUri = serviceUri;
     }
 
     @Override
-    public void start() throws InterruptedException {
+    public void start() {
         bossGroup = new NioEventLoopGroup();
         workerGroup = new NioEventLoopGroup();
         ServerBootstrap bootstrap = new ServerBootstrap();
@@ -48,9 +48,23 @@ public class RpcServer implements IServer {
                 })
                 .option(ChannelOption.SO_BACKLOG, 128)
                 .childOption(ChannelOption.SO_KEEPALIVE, true);
-        bootstrap.bind(port).sync();
-        System.out.println("server init success...");
-        System.out.println(String.format("server ip: %s, port: %d", InetAddress.getLoopbackAddress(), port));
+        ChannelFuture channelFuture = bootstrap.bind(port);
+        channelFuture.addListener(new ChannelFutureListener() {
+            @Override
+            public void operationComplete(ChannelFuture future) throws Exception {
+                System.out.println("server init success...");
+                System.out.println(String.format("server ip: %s, port: %d", InetAddress.getLoopbackAddress(), port));
+                ZKClient.instance.createNode(serviceUri, String.format("%s:%d",
+                        InetAddress.getLoopbackAddress().getHostAddress(), port));
+            }
+        });
+        channelFuture.channel().closeFuture().addListener(new ChannelFutureListener() {
+            @Override
+            public void operationComplete(ChannelFuture future) throws Exception {
+                System.out.println("停机...");
+                ZKClient.instance.delNode(serviceUri);
+            }
+        });
     }
 
     @Override

@@ -3,6 +3,7 @@ package com.wjw.rpc.core;
 import com.wjw.rpc.core.constant.RecConstants;
 import com.wjw.rpc.core.remote.RpcServer;
 import com.wjw.rpc.core.service.*;
+import com.wjw.rpc.core.zk.ZKClient;
 
 /**
  * @description:
@@ -21,37 +22,23 @@ public class BootStrap {
     }
 
     private void init() {
-        checkArgs();
-        try {
-            String rpcPort = System.getProperty("rpcPort", "15000");
-            System.out.println(rpcPort);
-            new RpcServer(Integer.valueOf(rpcPort)).start();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        String rpcPort = System.getProperty("rpcPort", "15000");
+        System.out.println(rpcPort);
+        RpcServer rpcServer = new RpcServer(Integer.valueOf(rpcPort), serviceMeta.getServiceUri());
+        rpcServer.start();
         Processor serviceProcessor = new ServiceProcessor(serviceMeta, instance);
         RpcContext rpcContext = DefaultRpcContext.instance;
         rpcContext.put(RecConstants.RPC_SERVICE, serviceMeta.getServiceUri(), serviceProcessor);
         rpcContext.put(RecConstants.RPC_META, serviceMeta.getServiceUri(), serviceMeta);
         System.out.println("初始化完成");
-    }
-
-    private void checkArgs() {
-        // TODO
-//        Objects.requireNonNull(instance);
-//        try {
-//            Class<?> clazz = Class.forName(serviceMeta.getInterfaceName());
-//            if (!clazz.isInterface()) {
-//                throw new IllegalArgumentException("interfaceName must interface");
+//        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+//            System.out.println("宕机...");
+//            try {
+//                ZKClient.instance.delNode(serviceMeta.getServiceUri());
+//            } catch (Exception e) {
+//                e.printStackTrace();
 //            }
-//            Method[] methods = clazz.getMethods();
-//            if (ArrayUtils.isEmpty(methods)) {
-//                throw new IllegalArgumentException("interface method not able 0");
-//            }
-//        } catch (ClassNotFoundException e) {
-//            e.printStackTrace();
-//        }
-//        Objects.requireNonNull(serviceMeta.getServiceUri());
+//        }));
     }
 
     public void setInterface(String interfaceName) {

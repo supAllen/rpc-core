@@ -2,7 +2,6 @@ package com.wjw.rpc.core.remote;
 
 import com.wjw.rpc.core.command.Command;
 import com.wjw.rpc.core.command.Request;
-import com.wjw.rpc.core.command.Response;
 import com.wjw.rpc.core.future.ResponseFuture;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
@@ -29,21 +28,19 @@ import static com.wjw.rpc.core.command.Response.EMPTY;
  * @create: 2020-09-30 15:56
  **/
 public class RpcClient {
-    private String ip = "127.0.0.1";
-    private Integer port = 15000;
     static final boolean SSL = System.getProperty("ssl") != null;
     private Channel channel;
     private EventLoopGroup group;
 
-    public RpcClient() {
+    public RpcClient(String host, int port) {
         try {
-            init();
+            init(host, port);
         } catch (SSLException e) {
             e.printStackTrace();
         }
     }
 
-    private void init() throws SSLException {
+    private void init(String host, int port) throws SSLException {
         // Configure SSL.
         final SslContext sslCtx;
         if (SSL) {
@@ -57,14 +54,14 @@ public class RpcClient {
         try {
             Bootstrap b = new Bootstrap();
             b.group(group)
-                    .remoteAddress(ip, port)
+                    .remoteAddress(host, port)
                     .channel(NioSocketChannel.class)
                     .handler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         public void initChannel(SocketChannel ch) throws Exception {
                             ChannelPipeline p = ch.pipeline();
                             if (sslCtx != null) {
-                                p.addLast(sslCtx.newHandler(ch.alloc(), ip, port));
+                                p.addLast(sslCtx.newHandler(ch.alloc(), host, port));
                             }
                             p.addLast(
                                     new ObjectEncoder(),

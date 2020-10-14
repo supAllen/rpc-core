@@ -71,7 +71,9 @@ public final class ObjectEchoServer {
                     });
 
             // Bind and start to accept incoming connections.
-            b.bind(PORT);
+            long start = System.currentTimeMillis();
+            b.bind(PORT).sync();
+            System.out.println("server bind port time " + (System.currentTimeMillis() - start));
         } finally {
 //            bossGroup.shutdownGracefully();
 //            workerGroup.shutdownGracefully();

@@ -9,9 +9,8 @@ public interface IServer {
 
     /**
      * 服务启动
-     * @exception InterruptedException
      */
-    void start() throws InterruptedException;
+    void start();
 
     /**
      * 服务停止

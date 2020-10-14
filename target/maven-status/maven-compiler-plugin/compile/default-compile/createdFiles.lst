@@ -4,6 +4,7 @@ com/wjw/rpc/core/command/Response.class
 com/wjw/rpc/core/service/ServiceProcessor.class
 com/wjw/rpc/core/remote/RpcClientSimple.class
 com/wjw/rpc/core/service/DefaultRpcContext$1.class
+com/wjw/rpc/core/remote/RpcServer$2.class
 com/wjw/rpc/core/remote/IServer.class
 com/wjw/rpc/core/remote/DefaultClientHandler.class
 com/wjw/rpc/core/remote/RpcExecutor.class
@@ -18,8 +19,10 @@ com/wjw/rpc/core/remote/RpcClient.class
 com/wjw/rpc/core/service/RpcContext.class
 com/wjw/rpc/core/future/ResponseFuture.class
 com/wjw/rpc/core/remote/RpcServer.class
+com/wjw/rpc/core/zk/ZKClient.class
 com/wjw/rpc/core/remote/RpcServer$1.class
 com/wjw/rpc/core/remote/RpcClient$3.class
 com/wjw/rpc/core/remote/RpcClient$2.class
 com/wjw/rpc/core/remote/DefaultServerHandler.class
 com/wjw/rpc/core/command/RequestCommand.class
+com/wjw/rpc/core/remote/RpcServer$3.class
