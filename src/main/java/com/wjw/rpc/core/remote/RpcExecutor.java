@@ -18,7 +18,7 @@ public class RpcExecutor {
     public RpcExecutor(String serverUri) {
         String data = null;
         try {
-            data = ZKClient.instance.getData(serverUri);
+            data = ZKClient.getInstance().getData(serverUri);
             System.out.println("host and port: "+data);
         } catch (Exception e) {
             e.printStackTrace();

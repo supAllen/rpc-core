@@ -54,7 +54,7 @@ public class RpcServer implements IServer {
             public void operationComplete(ChannelFuture future) throws Exception {
                 System.out.println("server init success...");
                 System.out.println(String.format("server ip: %s, port: %d", InetAddress.getLoopbackAddress(), port));
-                ZKClient.instance.createNode(serviceUri, String.format("%s:%d",
+                ZKClient.getInstance().createNode(serviceUri, String.format("%s:%d",
                         InetAddress.getLoopbackAddress().getHostAddress(), port));
             }
         });
@@ -62,7 +62,7 @@ public class RpcServer implements IServer {
             @Override
             public void operationComplete(ChannelFuture future) throws Exception {
                 System.out.println("停机...");
-                ZKClient.instance.delNode(serviceUri);
+                ZKClient.getInstance().delNode(serviceUri);
             }
         });
     }

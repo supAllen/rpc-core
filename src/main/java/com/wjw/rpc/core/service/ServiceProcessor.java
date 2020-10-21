@@ -1,5 +1,7 @@
 package com.wjw.rpc.core.service;
 
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
 import com.wjw.rpc.core.command.RequestCommand;
 import com.wjw.rpc.core.command.Response;
 import org.apache.commons.lang3.ArrayUtils;
@@ -7,17 +9,19 @@ import org.apache.commons.lang3.ArrayUtils;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
- * @description:
+ * @description: 具体方法反射执行逻辑
  * @author: wang.jianwen
  * @create: 2020-09-29 17:00
  **/
 public class ServiceProcessor implements Processor{
-    private ServiceMeta serviceMeta;
-    private Object serviceInstance;
-    private Map<String, Method> methods = new HashMap<String, Method>();
+    private final ServiceMeta serviceMeta;
+    private final Object serviceInstance;
+    private final Map<String, Map<Integer, Method>> methods = new HashMap<>();
 
     public ServiceProcessor(ServiceMeta serviceMeta, Object serviceInstance) {
         this.serviceMeta = serviceMeta;
@@ -35,7 +39,8 @@ public class ServiceProcessor implements Processor{
                 throw new IllegalArgumentException("interface method is 0");
             }
             for (Method method : allMethod) {
-                methods.put(method.getName(), method);
+                int methodIdentity = Lists.newArrayList(method.getParameterTypes()).hashCode();
+                methods.put(method.getName(), ImmutableMap.of(methodIdentity, method));
             }
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
@@ -46,7 +51,8 @@ public class ServiceProcessor implements Processor{
     public Response handler(RequestCommand command) throws InvocationTargetException, IllegalAccessException {
         String methodName = command.getMethod();
         Map<String, Object> params = command.getParams();
-        Method method = methods.get(methodName);
+        List<Class<?>> paramTypes = params.values().stream().map(Object::getClass).collect(Collectors.toList());
+        Method method = methods.get(methodName).get(paramTypes.hashCode());
         System.out.println("instance "+this.serviceInstance);
         System.out.println("params: "+params.values());
         // 参数必须是个object数组，不能是列表
