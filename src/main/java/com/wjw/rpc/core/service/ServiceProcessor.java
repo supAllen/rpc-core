@@ -1,6 +1,5 @@
 package com.wjw.rpc.core.service;
 
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.wjw.rpc.core.command.RequestCommand;
 import com.wjw.rpc.core.command.Response;
@@ -40,7 +39,7 @@ public class ServiceProcessor implements Processor{
             }
             for (Method method : allMethod) {
                 int methodIdentity = Lists.newArrayList(method.getParameterTypes()).hashCode();
-                methods.put(method.getName(), ImmutableMap.of(methodIdentity, method));
+                methods.computeIfAbsent(method.getName(), v -> new HashMap<>()).put(methodIdentity, method);
             }
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
