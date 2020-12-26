@@ -5,7 +5,9 @@ import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.retry.ExponentialBackoffRetry;
 import org.apache.zookeeper.CreateMode;
+import org.apache.zookeeper.data.Stat;
 
+import java.security.SecureRandom;
 import java.util.Objects;
 
 /**
@@ -16,6 +18,7 @@ import java.util.Objects;
 public class ZKClient {
     static final String CONN_ADDR = System.getProperty("zk-addr", "127.0.0.1:2181");
     static final int SESSION_TIMEOUT = 5000;
+    static final SecureRandom random = new SecureRandom();
     private static CuratorFramework cf;
     public static final ZKClient instance = new ZKClient();
     static {
@@ -29,19 +32,45 @@ public class ZKClient {
     }
 
     public void createNode(String path, String data) throws Exception {
-        cf.create().creatingParentsIfNeeded().forPath(path, data.getBytes());
+        doCreateNode(path, data, CreateMode.PERSISTENT);
     }
 
     public void createNode(String path, String data, CreateMode mode) throws Exception {
-        cf.create().creatingParentsIfNeeded().withMode(mode).forPath(path, data.getBytes());
+        doCreateNode(path, data, mode);
     }
 
     public void delNode(String path) throws Exception {
+        Stat stat = exist(path);
+        if (Objects.isNull(stat)) {
+            return;
+        }
         cf.delete().guaranteed().deletingChildrenIfNeeded().forPath(path);
     }
 
+    private Stat exist(String path) throws Exception {
+        return cf.checkExists().forPath(path);
+    }
+
     public String getData(String path) throws Exception {
-        byte[] data = cf.getData().forPath(path);
-        return Objects.isNull(data) ? null : new String(data);
+        byte[] data = getDataSimple(path);
+        if (Objects.isNull(data)) {
+            return null;
+        }
+        String hostAndPortList = new String(data);
+        String[] split = hostAndPortList.split(",");
+        return split[random.nextInt(split.length)];
+    }
+
+    private byte[] getDataSimple(String path) throws Exception {
+        return cf.getData().forPath(path);
+    }
+
+    private void doCreateNode(String path, String data, CreateMode mode) throws Exception {
+        byte[] bytes = getDataSimple(path);
+        if (!Objects.isNull(bytes)) {
+            cf.setData().forPath(path, (new String(bytes) + "," + data).getBytes());
+            return;
+        }
+        cf.create().creatingParentsIfNeeded().withMode(mode).forPath(path, data.getBytes());
     }
 }
