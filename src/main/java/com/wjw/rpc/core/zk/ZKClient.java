@@ -20,7 +20,6 @@ public class ZKClient {
     static final int SESSION_TIMEOUT = 5000;
     static final SecureRandom random = new SecureRandom();
     private static CuratorFramework cf;
-    public static final ZKClient instance = new ZKClient();
     static {
         RetryPolicy retryPolicy = new ExponentialBackoffRetry(1000, 10);
         cf = CuratorFrameworkFactory.builder()
